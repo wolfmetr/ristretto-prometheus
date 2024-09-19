@@ -13,7 +13,7 @@ var ErrDuplicateMetricName = errors.New("duplicate metric name")
 var _ prometheus.Collector = (*Collector)(nil)
 
 type Collector struct {
-	provider MetricsProvider
+	source *ristretto.Metrics
 
 	// metrics contains all descriptions to be registered on a
 	// Prometheus metrics registry for the Ristretto cache.
@@ -26,17 +26,9 @@ type metric struct {
 	extractor MetricValueExtractor
 }
 
-// NewCollector returns a Prometheus metrics collector using metrics from the
-// provided cache instance.
-func NewCollector(cache *ristretto.Cache, opts ...Option) (*Collector, error) {
-	provider := NewCacheMetricsProvider(cache)
-
-	return NewMetricsCollector(provider.Provide, opts...)
-}
-
-// NewCollector returns a Prometheus metrics collector using metrics from the
+// NewMetricsCollector returns a Prometheus metrics collector using metrics from the
 // given provider.
-func NewMetricsCollector(provider MetricsProvider, opts ...Option) (*Collector, error) {
+func NewMetricsCollector(source *ristretto.Metrics, opts ...Option) (*Collector, error) {
 	var conf config
 	conf.apply(opts)
 
@@ -57,8 +49,8 @@ func NewMetricsCollector(provider MetricsProvider, opts ...Option) (*Collector, 
 	}
 
 	return &Collector{
-		provider: provider,
-		metrics:  metrics,
+		source:  source,
+		metrics: metrics,
 	}, nil
 }
 
@@ -69,8 +61,10 @@ func (c Collector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c Collector) Collect(ch chan<- prometheus.Metric) {
-	metrics := c.provider()
+	if c.source == nil {
+		return
+	}
 	for _, m := range c.metrics {
-		ch <- prometheus.MustNewConstMetric(m.desc, m.valueType, m.extractor(metrics))
+		ch <- prometheus.MustNewConstMetric(m.desc, m.valueType, m.extractor(c.source))
 	}
 }
