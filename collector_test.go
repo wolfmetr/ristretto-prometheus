@@ -13,7 +13,7 @@ import (
 )
 
 func TestNewCollector(t *testing.T) {
-	cache, err := ristretto.NewCache(&ristretto.Config{
+	cache, err := ristretto.NewCache[string, string](&ristretto.Config[string, string]{
 		NumCounters: 1e3,
 		MaxCost:     1 << 30,
 		BufferItems: 64,
@@ -24,8 +24,8 @@ func TestNewCollector(t *testing.T) {
 	}
 	defer cache.Close()
 
-	ristrettoCollector, err := ristretto_prometheus.NewCollector(
-		cache,
+	ristrettoCollector, err := ristretto_prometheus.NewMetricsCollector(
+		cache.Metrics,
 		ristretto_prometheus.WithNamespace("appname"),
 		ristretto_prometheus.WithSubsystem("subsystemname"),
 		ristretto_prometheus.WithConstLabels(prometheus.Labels{"app_version": "v1.2.3"}),
