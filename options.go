@@ -1,7 +1,7 @@
 package ristretto_prometheus
 
 import (
-	"github.com/dgraph-io/ristretto"
+	"github.com/dgraph-io/ristretto/v2"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

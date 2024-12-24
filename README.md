@@ -10,7 +10,7 @@ Prometheus Collector for Ristretto Cache metrics
 package main
 
 import (
-	"github.com/dgraph-io/ristretto"
+	"github.com/dgraph-io/ristretto/v2"
 	"github.com/prometheus/client_golang/prometheus"
 
 	ristretto_prometheus "github.com/wolfmetr/ristretto-prometheus"
