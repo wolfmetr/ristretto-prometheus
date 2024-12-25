@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dgraph-io/ristretto"
+	"github.com/dgraph-io/ristretto/v2"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 
 	ristretto_prometheus "github.com/wolfmetr/ristretto-prometheus"
 )
 
-func ExampleNewCollector() {
+func ExampleNewMetricsCollector() {
 	cache, err := ristretto.NewCache[string, string](&ristretto.Config[string, string]{
 		NumCounters: 1e3,
 		MaxCost:     1 << 30,
